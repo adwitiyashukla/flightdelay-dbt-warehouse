@@ -15,8 +15,9 @@ models:
       - name: calendar_month
         tests:
           - within_range:
-              min_value: 1
-              max_value: 12
+              arguments:
+                min_value: 1
+                max_value: 12
 
   - name: dim_airport
     description: Conformed airport dimension covering the FAA list and every flight endpoint
@@ -62,7 +63,8 @@ models:
       - name: size_class
         tests:
           - accepted_values:
-              values: ["regional", "narrowbody", "widebody", "unknown"]
+              arguments:
+                values: ["regional", "narrowbody", "widebody", "unknown"]
       - name: age_years_in_2013
         tests:
           - non_negative:
@@ -80,31 +82,36 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_date')
-              field: date_key
+              arguments:
+                to: ref('dim_date')
+                field: date_key
       - name: carrier_key
         tests:
           - not_null
           - relationships:
-              to: ref('dim_carrier')
-              field: carrier_key
+              arguments:
+                to: ref('dim_carrier')
+                field: carrier_key
       - name: origin_airport_key
         tests:
           - not_null
           - relationships:
-              to: ref('dim_airport')
-              field: airport_key
+              arguments:
+                to: ref('dim_airport')
+                field: airport_key
       - name: destination_airport_key
         tests:
           - not_null
           - relationships:
-              to: ref('dim_airport')
-              field: airport_key
+              arguments:
+                to: ref('dim_airport')
+                field: airport_key
       - name: aircraft_key
         tests:
           - relationships:
-              to: ref('dim_aircraft')
-              field: aircraft_key
+              arguments:
+                to: ref('dim_aircraft')
+                field: aircraft_key
               config:
                 where: tail_number is not null
       - name: distance_miles
@@ -113,5 +120,6 @@ models:
       - name: scheduled_departure_hour_local
         tests:
           - within_range:
-              min_value: 0
-              max_value: 23
+              arguments:
+                min_value: 0
+                max_value: 23

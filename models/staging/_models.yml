@@ -15,8 +15,9 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_carrier')
-              field: carrier_code
+              arguments:
+                to: ref('stg_carrier')
+                field: carrier_code
       - name: origin_code
         tests:
           - not_null
@@ -24,8 +25,9 @@ models:
         tests:
           - not_null
           - within_range:
-              min_value: 0
-              max_value: 1439
+              arguments:
+                min_value: 0
+                max_value: 1439
       - name: distance_miles
         tests:
           - non_negative
@@ -37,7 +39,8 @@ models:
     description: Hourly weather with impossible wind readings nulled and one row per airport hour
     tests:
       - unique:
-          column_name: "origin_code || observed_hour_utc"
+          arguments:
+            column_name: "origin_code || observed_hour_utc"
     columns:
       - name: origin_code
         tests:
@@ -48,8 +51,9 @@ models:
       - name: wind_speed_mph
         tests:
           - within_range:
-              min_value: 0
-              max_value: 200
+              arguments:
+                min_value: 0
+                max_value: 200
               config:
                 where: wind_speed_mph is not null
 
@@ -66,8 +70,9 @@ models:
       - name: manufactured_year
         tests:
           - within_range:
-              min_value: 1950
-              max_value: 2013
+              arguments:
+                min_value: 1950
+                max_value: 2013
               config:
                 where: manufactured_year is not null
 
@@ -107,14 +112,17 @@ models:
       - name: source_system
         tests:
           - accepted_values:
-              values: ["faa_matched_iata", "faa_matched_local", "faa_only", "reference_only"]
+              arguments:
+                values: ["faa_matched_iata", "faa_matched_local", "faa_only", "reference_only"]
       - name: latitude
         tests:
           - within_range:
-              min_value: -90
-              max_value: 90
+              arguments:
+                min_value: -90
+                max_value: 90
       - name: longitude
         tests:
           - within_range:
-              min_value: -180
-              max_value: 180
+              arguments:
+                min_value: -180
+                max_value: 180
