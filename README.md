@@ -7,9 +7,6 @@ files, loads them into a raw schema month by month, and then dbt turns that into
 a star schema and five marts. Everything runs on one machine from a single
 DuckDB file. There is no Docker, no server, and no cloud account.
 
-I picked flight data because it has a natural star schema and enough real mess
-in it to make the tests do actual work.
-
 ## Pipeline
 
 ```mermaid
@@ -125,39 +122,7 @@ New York all year. Frontier is late on 37.1 percent. Part of that gap is made up
 in the air rather than on the ground. Alaska gains 15.8 minutes on an average
 flight and Virgin America 11.0, while Frontier loses another 1.7.
 
-## Things that went wrong
-
-DuckDB's `/` is true division, so my first conversion of `sched_dep_time` to
-minutes produced 324 instead of 315 for a 5:15 departure. I only caught it
-because the `within_range` test on the result failed with 963 rows over 1439.
-That test existed because the column looked too obvious to get wrong.
-
-The Rdatasets export writes missing values as empty strings, not `NA`. I set
-`nullstr = "NA"` on the reader out of habit, which stopped DuckDB treating the
-empty strings as null, so `dep_delay` and `arr_delay` came in as text. Dropping
-the setting fixed the types.
-
-Naming the database file `warehouse.duckdb` made the catalog name collide with
-the `warehouse` schema, and every qualified reference became ambiguous. The file
-is now `flightdelay.duckdb`.
-
-Four destinations in the flight data, SJU, BQN, PSE and STT, are missing from
-the FAA airport list that ships with nycflights13. Without handling them the
-fact table has destination keys pointing at nothing. `dim_airport` now fills
-them from OurAirports and records where each row came from: 1,214 airports
-matched by IATA code, 164 by local code, 80 exist only in the FAA list and 4
-only in the global reference.
-
-`dep_time` and `arr_time` use 2400 for midnight, which is 179 rows across the
-year and breaks a plain modulo conversion.
-
-721 of the 4,043 tail numbers that actually flew have no row in the aircraft
-reference. `dim_aircraft` keeps them with a flag rather than dropping the
-flights.
-
 ## Numbers
-
-Measured on my laptop, an HP OmniBook 5 with 8 GB of RAM, Python 3.13.
 
 | Step | Time |
 | --- | --- |
