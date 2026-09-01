@@ -103,12 +103,12 @@ Weather hits cancellations harder than it hits delays.
 
 | Condition | Flights | Cancelled | Delayed | Avg delay |
 | --- | --- | --- | --- | --- |
-| No precipitation | 312,218 | 2.02% | 19.91% | 11.4 min |
-| Heavy precipitation | 1,783 | 7.91% | 44.48% | 40.5 min |
-| Visibility 10 miles or more | 278,739 | 1.82% | 19.72% | 11.0 min |
-| Visibility under 1 mile | 3,975 | 8.93% | 29.71% | 29.7 min |
-| Wind under 10 mph | 149,178 | 1.94% | 19.17% | 11.0 min |
-| Wind 30 mph or more | 993 | 10.27% | 29.71% | 28.0 min |
+| No precipitation | 312,218 | 2.02% | 19.91% | 11.37 min |
+| Heavy precipitation | 1,783 | 7.91% | 44.48% | 40.52 min |
+| Visibility 10 miles or more | 278,739 | 1.82% | 19.72% | 10.95 min |
+| Visibility under 1 mile | 3,975 | 8.93% | 29.71% | 29.72 min |
+| Wind under 10 mph | 149,178 | 1.94% | 19.17% | 11.00 min |
+| Wind 30 mph or more | 993 | 10.27% | 29.71% | 28.04 min |
 
 The two worst days in the year are 8 and 9 February. LaGuardia cancelled
 65.9 percent of its departures on the 9th, Newark 57.6 percent, and JFK
@@ -119,10 +119,11 @@ Holidays are calmer, not busier. On the ten US federal holidays 17.0 percent of
 departures ran late against 20.6 percent on other days, and cancellations were
 1.24 percent against 2.46 percent.
 
-Carriers differ more than I expected. Alaska arrives late on 14.3 percent of
-flights and averages 9.9 minutes early. Frontier is late on 37.1 percent. The
-gap is not only departure discipline: Alaska makes up 15.8 minutes in the air on
-an average flight and Virgin America 11.0, while Frontier loses another 1.7.
+Carriers differ more than I expected. Hawaiian and Alaska arrive late on 12.6
+and 14.3 percent of flights, both flying only a few hundred departures out of
+New York all year. Frontier is late on 37.1 percent. Part of that gap is made up
+in the air rather than on the ground. Alaska gains 15.8 minutes on an average
+flight and Virgin America 11.0, while Frontier loses another 1.7.
 
 ## Things that went wrong
 
@@ -164,7 +165,7 @@ Measured on my laptop, an HP OmniBook 5 with 8 GB of RAM, Python 3.13.
 | dbt build, 124 nodes | 5.49 s |
 | pytest, 35 tests | 13.1 s |
 
-The sources are 48 MB of CSV. The finished DuckDB file is 36 MB and holds
+The sources are 47 MB of CSV. The finished DuckDB file is 36 MB and holds
 459,862 raw rows, 336,776 fact rows, 224 routes, 4,043 aircraft and a 365 day
 date dimension. 8,255 flights were cancelled and 1,175 diverted. The weather
 join covers 99.53 percent of flights.

@@ -30,7 +30,7 @@ jobs:
       - name: Sqlfluff
         run: sqlfluff lint models macros dbt_tests
       - name: Pytest
-        run: pytest
+        run: python -m pytest
 
   warehouse:
     runs-on: ubuntu-latest
