@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DBT_PROFILES_DIR: ${{ github.workspace }}
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Ruff
+        run: ruff check .
+      - name: Sqlfluff
+        run: sqlfluff lint models macros dbt_tests
+      - name: Pytest
+        run: pytest
+
+  warehouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Ingest
+        run: flightdelay ingest
+      - name: Status
+        run: flightdelay status
+      - name: Build and test
+        run: dbt build
+      - name: Assert incremental rerun changes nothing
+        run: |
+          BEFORE=$(python -c "import duckdb; print(duckdb.connect('data/flightdelay.duckdb', read_only=True).execute('select count(*) from warehouse.fct_flight').fetchone()[0])")
+          dbt run --select fct_flight
+          AFTER=$(python -c "import duckdb; print(duckdb.connect('data/flightdelay.duckdb', read_only=True).execute('select count(*) from warehouse.fct_flight').fetchone()[0])")
+          test "$BEFORE" = "$AFTER"
+          echo "fct_flight stable at $AFTER rows"
+      - name: Assert single month reingest keeps the year intact
+        run: |
+          flightdelay ingest --months 2013-06 --skip-download
+          python -c "
+          import duckdb, sys
+          rows = duckdb.connect('data/flightdelay.duckdb', read_only=True).execute('select count(*) from raw.flights').fetchone()[0]
+          sys.exit(0 if rows == 336776 else 1)
+          "
+      - name: Snapshot
+        run: dbt snapshot
+      - name: Docs
+        run: dbt docs generate
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-docs
+          path: |
+            target/manifest.json
+            target/catalog.json
+            target/index.html

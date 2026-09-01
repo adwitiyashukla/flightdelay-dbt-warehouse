@@ -1,0 +1,54 @@
+[warehouse]
+path = "data/flightdelay.duckdb"
+
+[ingest]
+raw_dir = "data/raw"
+months = [
+    "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06",
+    "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12",
+]
+
+[http]
+timeout_s = 60.0
+retries = 3
+backoff_s = 2.0
+
+[[sources]]
+name = "flights"
+url = "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/nycflights13/flights.csv"
+file = "flights.csv"
+monthly = true
+
+[[sources]]
+name = "weather"
+url = "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/nycflights13/weather.csv"
+file = "weather.csv"
+monthly = true
+
+[[sources]]
+name = "planes"
+url = "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/nycflights13/planes.csv"
+file = "planes.csv"
+
+[[sources]]
+name = "airlines"
+url = "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/nycflights13/airlines.csv"
+file = "airlines.csv"
+
+[[sources]]
+name = "airports"
+url = "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/nycflights13/airports.csv"
+file = "airports.csv"
+
+[[sources]]
+name = "ourairports_airports"
+url = "https://raw.githubusercontent.com/davidmegginson/ourairports-data/main/airports.csv"
+file = "ourairports_airports.csv"
+
+[[sources]]
+name = "openflights_airlines"
+url = "https://raw.githubusercontent.com/jpatokal/openflights/master/data/airlines.dat"
+file = "openflights_airlines.dat"
+header = false
+nullstr = "\\N"
+columns = ["airline_id", "name", "alias", "iata", "icao", "callsign", "country", "active"]

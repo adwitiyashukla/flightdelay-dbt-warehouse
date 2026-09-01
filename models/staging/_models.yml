@@ -1,0 +1,120 @@
+version: 2
+
+models:
+  - name: stg_flight
+    description: Flights with times converted to minutes past midnight and cancellation flags derived
+    columns:
+      - name: flight_key
+        tests:
+          - unique
+          - not_null
+      - name: flight_date
+        tests:
+          - not_null
+      - name: carrier_code
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_carrier')
+              field: carrier_code
+      - name: origin_code
+        tests:
+          - not_null
+      - name: scheduled_departure_minute
+        tests:
+          - not_null
+          - within_range:
+              min_value: 0
+              max_value: 1439
+      - name: distance_miles
+        tests:
+          - non_negative
+      - name: air_time_minutes
+        tests:
+          - non_negative
+
+  - name: stg_weather
+    description: Hourly weather with impossible wind readings nulled and one row per airport hour
+    tests:
+      - unique:
+          column_name: "origin_code || observed_hour_utc"
+    columns:
+      - name: origin_code
+        tests:
+          - not_null
+      - name: observed_hour_utc
+        tests:
+          - not_null
+      - name: wind_speed_mph
+        tests:
+          - within_range:
+              min_value: 0
+              max_value: 200
+              config:
+                where: wind_speed_mph is not null
+
+  - name: stg_plane
+    description: Aircraft reference keyed by tail number
+    columns:
+      - name: tail_number
+        tests:
+          - unique
+          - not_null
+      - name: seat_count
+        tests:
+          - non_negative
+      - name: manufactured_year
+        tests:
+          - within_range:
+              min_value: 1950
+              max_value: 2013
+              config:
+                where: manufactured_year is not null
+
+  - name: stg_carrier
+    description: Carriers in the flight data enriched with OpenFlights identity columns
+    columns:
+      - name: carrier_code
+        tests:
+          - unique
+          - not_null
+      - name: carrier_name
+        tests:
+          - not_null
+
+  - name: stg_airport_reference
+    description: OurAirports global airport reference with blank strings nulled
+    columns:
+      - name: ident
+        tests:
+          - unique
+          - not_null
+      - name: iata_code
+        tests:
+          - unique:
+              config:
+                where: iata_code is not null
+
+  - name: stg_airport
+    description: >
+      FAA airports conformed against the OurAirports reference by IATA then local code,
+      with flight endpoints missing from the FAA list filled from the reference
+    columns:
+      - name: airport_code
+        tests:
+          - unique
+          - not_null
+      - name: source_system
+        tests:
+          - accepted_values:
+              values: ["faa_matched_iata", "faa_matched_local", "faa_only", "reference_only"]
+      - name: latitude
+        tests:
+          - within_range:
+              min_value: -90
+              max_value: 90
+      - name: longitude
+        tests:
+          - within_range:
+              min_value: -180
+              max_value: 180

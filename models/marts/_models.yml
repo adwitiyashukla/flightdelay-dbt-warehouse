@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: mart_carrier_performance
+    description: One row per carrier with delay, cancellation and network reach measures
+    columns:
+      - name: carrier_code
+        tests:
+          - unique
+          - not_null
+      - name: flight_count
+        tests:
+          - non_negative
+      - name: cancellation_rate_pct
+        tests:
+          - within_range:
+              min_value: 0
+              max_value: 100
+      - name: arrival_delay_rate_pct
+        tests:
+          - within_range:
+              min_value: 0
+              max_value: 100
+
+  - name: mart_route_performance
+    description: One row per origin and destination pair flown in 2013
+    columns:
+      - name: route_code
+        tests:
+          - unique
+          - not_null
+      - name: destination_name
+        tests:
+          - not_null
+      - name: cancellation_rate_pct
+        tests:
+          - within_range:
+              min_value: 0
+              max_value: 100
+      - name: avg_ground_speed_mph
+        tests:
+          - within_range:
+              min_value: 50
+              max_value: 800
+              config:
+                where: avg_ground_speed_mph is not null
+
+  - name: mart_weather_impact
+    description: Delay and cancellation rates by visibility, precipitation and wind band
+    tests:
+      - unique:
+          column_name: "condition_type || condition_band"
+    columns:
+      - name: condition_type
+        tests:
+          - accepted_values:
+              values: ["visibility", "precipitation", "wind"]
+      - name: departure_delay_rate_pct
+        tests:
+          - within_range:
+              min_value: 0
+              max_value: 100
+
+  - name: mart_daily_operations
+    description: One row per day and origin airport with operations and weather summary
+    tests:
+      - unique:
+          column_name: "date_day || origin_code"
+    columns:
+      - name: date_day
+        tests:
+          - not_null
+      - name: origin_code
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["EWR", "JFK", "LGA"]
+      - name: flight_count
+        tests:
+          - non_negative
+
+  - name: mart_aircraft_utilization
+    description: One row per tail number with utilization and delay measures
+    columns:
+      - name: tail_number
+        tests:
+          - unique
+          - not_null
+      - name: flights_per_active_day
+        tests:
+          - within_range:
+              min_value: 1
+              max_value: 30

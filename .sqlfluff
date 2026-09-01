@@ -1,0 +1,27 @@
+[sqlfluff]
+dialect = duckdb
+templater = jinja
+max_line_length = 100
+exclude_rules = LT02, LT05, ST06, RF01, RF02, RF03, RF06, AM05
+
+[sqlfluff:rules:references.keywords]
+ignore_words = model,type,year,name,source,location
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+load_macros_from_path = macros
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = lower

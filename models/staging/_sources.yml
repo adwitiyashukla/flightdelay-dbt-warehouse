@@ -1,0 +1,70 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Tables loaded by the flightdelay ingest command
+    tables:
+      - name: flights
+        description: One row per scheduled departure from EWR, JFK or LGA in 2013
+        columns:
+          - name: rownames
+            tests:
+              - unique
+              - not_null
+          - name: carrier
+            tests:
+              - not_null
+          - name: origin
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ["EWR", "JFK", "LGA"]
+      - name: weather
+        description: Hourly observations at the three origin airports
+        columns:
+          - name: origin
+            tests:
+              - not_null
+          - name: time_hour
+            tests:
+              - not_null
+      - name: planes
+        description: Aircraft reference keyed by tail number
+        columns:
+          - name: tailnum
+            tests:
+              - unique
+              - not_null
+      - name: airlines
+        description: Carrier code to airline name
+        columns:
+          - name: carrier
+            tests:
+              - unique
+              - not_null
+      - name: airports
+        description: FAA airport reference shipped with nycflights13
+        columns:
+          - name: faa
+            tests:
+              - unique
+              - not_null
+      - name: ourairports_airports
+        description: Global airport reference maintained by OurAirports
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: ident
+            tests:
+              - unique
+              - not_null
+      - name: openflights_airlines
+        description: Global airline reference from OpenFlights
+        columns:
+          - name: airline_id
+            tests:
+              - unique
+              - not_null

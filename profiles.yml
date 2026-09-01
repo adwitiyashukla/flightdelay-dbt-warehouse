@@ -1,0 +1,7 @@
+flightdelay:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: data/flightdelay.duckdb
+      threads: 4
